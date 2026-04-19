@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>歌斐木造船</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #1e2b3c;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            min-height: 100vh;
+        }
+
+        .main-view { display: block; }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: linear-gradient(to right, #ffffff, #fafcff);
+            border-bottom: 2px solid #d4e0f0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            color: #1e4a6b;
+            background: #e1ecf4;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,20,40,0.08);
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #0a3144;
+            border-left: 2px solid #b0c8dd;
+            padding-left: 18px;
+        }
+        .logo-text small { font-size: 16px; font-weight: 400; color: #4a627a; margin-left: 8px; }
+
+        .login-btn {
+            background: #1e4a6b;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(28, 74, 107, 0.25);
+            transition: all 0.2s;
+            border: 1px solid #34678a;
+        }
+        .login-btn:hover { background: #0f3550; transform: translateY(-2px); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 20, 30, 0.6);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-modal {
+            background: white;
+            width: 400px;
+            max-width: 92%;
+            border-radius: 28px;
+            padding: 32px 28px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 22px;
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: #6b7f8f;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #1e2b3c; }
+
+        .login-modal h3 { font-size: 26px; font-weight: 600; color: #0a3144; margin-bottom: 24px; }
+
+        .input-group { margin-bottom: 22px; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 6px; color: #1e3b4f; }
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid #cfdde9;
+            border-radius: 18px;
+            outline: none;
+            background: #fbfdff;
+        }
+        .input-group input:focus { border-color: #1e4a6b; }
+
+        .login-action-btn {
+            width: 100%;
+            background: #1e4a6b;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-error {
+            color: #c0342c;
+            font-size: 15px;
+            margin-top: 14px;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        /* 轮播 */
+        .carousel-section { padding: 32px 32px 16px; background: #eaf0f8; }
+        .carousel-container { position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,0.1); }
+        .carousel-slide { width: 100%; height: 420px; object-fit: cover; display: block; }
+        .carousel-dots { display: flex; justify-content: center; gap: 12px; margin-top: 16px; }
+        .dot { width: 12px; height: 12px; background: #b8ccdd; border-radius: 20px; border: none; cursor: pointer; }
+        .dot.active { background: #1e4a6b; width: 32px; }
+        .carousel-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.85); border: none; width: 48px; height: 48px;
+            border-radius: 40px; font-size: 26px; color: #1e4a6b; cursor: pointer; z-index: 10;
+        }
+        .arrow-left { left: 20px; } .arrow-right { right: 20px; }
+
+        .company-section { padding: 48px 40px; background: white; }
+        .company-container { display: flex; flex-wrap: wrap; gap: 40px; align-items: center; }
+        .company-text h2 { font-size: 36px; font-weight: 600; color: #0a3144; margin-bottom: 20px; border-left: 8px solid #1e4a6b; padding-left: 24px; }
+        .company-image img { width: 100%; border-radius: 28px; box-shadow: 0 20px 30px -8px rgba(20,50,70,0.15); }
+        .footer-note { text-align: center; padding: 24px; color: #5f7d98; border-top: 1px solid #d9e2ec; }
+
+        /* 员工档案视图 */
+        .employee-view {
+            display: none;
+            padding: 28px 36px;
+            background: #fbfbf9;
+            min-height: 100vh;
+        }
+
+        .employee-title {
+            font-size: 56px;
+            font-weight: 800;
+            color: #FFC300;
+            text-shadow: 2px 2px 0 #b57f00;
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+        }
+
+        .orange-card {
+            border: 4px solid #FF8C00;
+            border-radius: 36px;
+            padding: 32px 40px;
+            background: #fffbf5;
+            box-shadow: 0 12px 24px rgba(255, 140, 0, 0.15);
+            max-width: 1000px;
+            user-select: text;  /* 允许选中 */
+        }
+
+        .record-row {
+            display: flex;
+            align-items: baseline;
+            padding: 16px 6px;
+            border-bottom: 3px solid #FFD966;
+            cursor: default;
+        }
+        .record-row:last-of-type { border-bottom: none; }
+        .record-row.clickable-row {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .record-row.clickable-row:hover {
+            background: rgba(255, 200, 100, 0.15);
+            border-radius: 16px;
+        }
+
+        .row-left {
+            flex: 1;
+            font-size: 20px;
+            font-weight: 600;
+            color: #E67E00;
+        }
+
+        .row-right {
+            flex: 2;
+            font-size: 20px;
+            color: #6F6F6F;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+            text-decoration-thickness: 2px;
+            font-weight: 500;
+            padding-left: 20px;
+        }
+
+        .back-home-btn {
+            background: transparent;
+            border: 2px solid #1e4a6b;
+            color: #1e4a6b;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-home-btn:hover { background: #1e4a6b; color: white; }
+
+        .employee-header { display: flex; align-items: center; justify-content: space-between; }
+
+        /* 员工详情视图 */
+        .employee-detail-view {
+            display: none;
+            padding: 30px 36px;
+            background: #fbfbf9;
+            min-height: 100vh;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .back-to-list-btn {
+            background: #e0e9f2;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1e4a6b;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .detail-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .detail-photo {
+            flex: 0 0 220px;
+            aspect-ratio: 3 / 4;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 18px 30px rgba(0,0,0,0.1);
+            border: 3px solid #fff;
+        }
+        .detail-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .detail-info {
+            flex: 1;
+            padding-top: 20px;
+        }
+        .detail-name {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1e2b3c;
+            margin-bottom: 18px;
+        }
+        .detail-wechat {
+            font-size: 24px;
+            color: #3a6b4f;
+            background: #eaf6ee;
+            display: inline-block;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        .wechat-icon { margin-right: 12px; color: #1e4a6b; }
+
+        .detail-intro-box {
+            border: 4px solid #FF8C00;
+            border-radius: 30px;
+            padding: 32px 38px;
+            background: #fffbf2;
+            margin-top: 20px;
+            clear: both;
+        }
+        .detail-intro-box p {
+            font-size: 19px;
+            line-height: 1.7;
+            color: #2d3e4f;
+            white-space: pre-wrap;
+            user-select: text;
+        }
+
+        @media (max-width: 700px) {
+            .employee-title { font-size: 40px; }
+            .orange-card { padding: 20px; }
+            .detail-photo { flex: 0 0 180px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <!-- 主视图 -->
+    <div id="mainView" class="main-view">
+        <header class="top-bar">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-sailboat" style="font-size: 34px;"></i></div>
+                <div class="logo-text">歌斐木造船<small>Gopher Wood</small></div>
+            </div>
+            <button class="login-btn" id="showLoginModalBtn"><i class="fas fa-user-lock"></i> 登录</button>
+        </header>
+
+        <div class="modal-overlay" id="loginModalOverlay">
+            <div class="login-modal">
+                <button class="modal-close" id="closeModalBtn"><i class="fas fa-times"></i></button>
+                <h3><i class="fas fa-warehouse"></i> 船厂入口</h3>
+                <div class="input-group">
+                    <label>用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码">
+                </div>
+                <button class="login-action-btn" id="loginSubmitBtn">登 录</button>
+                <div class="login-error" id="loginErrorMsg"></div>
+            </div>
+        </div>
+
+        <section class="carousel-section">
+            <div class="carousel-container" id="carouselContainer">
+                <img class="carousel-slide" id="factoryCarouselImg" src="account ARK.jpg" alt="工厂内景" onerror="this.onerror=null; this.src='https://picsum.photos/id/1043/1200/500';">
+                <button class="carousel-arrow arrow-left" id="prevSlideBtn"><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-arrow arrow-right" id="nextSlideBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="carousel-dots" id="carouselDots"></div>
+        </section>
+
+        <section class="company-section">
+            <div class="company-container">
+                <div class="company-text">
+                    <h2>歌斐木 · 匠心造船</h2>
+                    <p><strong>歌斐木造船</strong> 始于1985年，专注于高端木质游艇与古典帆船建造。</p>
+                    <p>工厂占地28000㎡，传承三代木工技艺，每一块木料都经过36道工序。</p>
+                    <p><i class="fas fa-check-circle" style="color: #1e4a6b;"></i> 国际船艇协会认证 · 20+专利技术</p>
+                </div>
+                <div class="company-image">
+                    <img src="https://picsum.photos/id/135/600/400" alt="歌斐木船厂">
+                </div>
+            </div>
+        </section>
+        <div class="footer-note"><i class="far fa-copyright"></i> 歌斐木造船 · 永恒的航行艺术</div>
+    </div>
+
+    <!-- 员工档案视图 -->
+    <div id="employeeView" class="employee-view">
+        <div class="employee-header">
+            <h1 class="employee-title">📋 员工档案</h1>
+            <button class="back-home-btn" id="backToHomeBtn"><i class="fas fa-arrow-left"></i> 返回首页</button>
+        </div>
+        <div class="orange-card" id="archiveCard">
+            <div id="recordRowsContainer"></div>
+        </div>
+    </div>
+
+    <!-- 员工详情视图 -->
+    <div id="employeeDetailView" class="employee-detail-view">
+        <div class="detail-header">
+            <h2 style="font-size: 38px; color: #1e4a6b;"><i class="fas fa-user-circle"></i> 员工详情</h2>
+            <button class="back-to-list-btn" id="backToEmployeeListBtn"><i class="fas fa-arrow-left"></i> 返回档案列表</button>
+        </div>
+
+        <div class="detail-content">
+            <div class="detail-photo">
+                <img src="我真帅.jpg" alt="员工照片" onerror="this.onerror=null; this.src='https://picsum.photos/id/64/400/600';">
+            </div>
+            <div class="detail-info">
+                <div class="detail-name" id="detailEmployeeName">尤梓涵</div>
+                <div class="detail-wechat">
+                    <i class="fab fa-weixin wechat-icon"></i> 
+                    <span id="detailWechatId">**********</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-intro-box">
+            <p id="detailIntroText">
+                植物大战僵尸高手、我的世界牢玩家、第五人格巅八人黄、猫和老鼠榜衣老鼠、明日方舟13o级博士、崩坏星穹铁道80级开拓者、蔚蓝档案非酋老师、星塔旅人懒人爬塔、洛克王国迪恩大将军、Kards预备上帅、哔哩哔哩六级硬核会员、本arg游戏的作者。当有人要说这里站不下这么多人时，我只能说还是太小看这位天才了。<br><br>
+                但是，令无数人惋惜的是，小尤涉及这么多领域，居然没和其团队中任何一个人重合。难道说天才就该被陨落吗。
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // DOM 元素
+        const mainView = document.getElementById('mainView');
+        const employeeView = document.getElementById('employeeView');
+        const employeeDetailView = document.getElementById('employeeDetailView');
+        const modalOverlay = document.getElementById('loginModalOverlay');
+        const showLoginBtn = document.getElementById('showLoginModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const usernameInput = document.getElementById('loginUsername');
+        const passwordInput = document.getElementById('loginPassword');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+        const loginErrorMsg = document.getElementById('loginErrorMsg');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const backToEmployeeListBtn = document.getElementById('backToEmployeeListBtn');
+
+        const VALID_USERNAME = 'ARK';
+        const VALID_PASSWORD = 'wesavior';
+
+        // 轮播图片
+        const images = [
+            'account ARK.jpg',
+            'keyword1 we.jpg',
+            'keyword2 sav.jpg',
+            'keyword3 ior.jpg'
+        ];
+        const carouselImg = document.getElementById('factoryCarouselImg');
+        const prevBtn = document.getElementById('prevSlideBtn');
+        const nextBtn = document.getElementById('nextSlideBtn');
+        const dotsContainer = document.getElementById('carouselDots');
+        let currentIndex = 0;
+        let autoTimer = null;
+        const AUTO_INTERVAL = 3800;
+
+        function setImageWithFallback(imgElement, src) {
+            imgElement.src = src;
+            imgElement.onerror = function() {
+                this.onerror = null;
+                const fallbackMap = [
+                    'https://picsum.photos/id/1043/1200/500',
+                    'https://picsum.photos/id/107/1200/500',
+                    'https://picsum.photos/id/20/1200/500',
+                    'https://picsum.photos/id/153/1200/500'
+                ];
+                const idx = images.indexOf(src);
+                this.src = fallbackMap[idx] || 'https://picsum.photos/id/1043/1200/500';
+            };
+        }
+
+        // 登录模态
+        function openModal() {
+            usernameInput.value = '';
+            passwordInput.value = '';
+            loginErrorMsg.textContent = '';
+            modalOverlay.style.display = 'flex';
+        }
+        function closeModal() { modalOverlay.style.display = 'none'; }
+
+        function switchToEmployeeView() {
+            if (autoTimer) clearInterval(autoTimer);
+            mainView.style.display = 'none';
+            employeeView.style.display = 'block';
+            employeeDetailView.style.display = 'none';
+            closeModal();
+            window.scrollTo({ top: 0 });
+        }
+
+        function switchToMainView() {
+            mainView.style.display = 'block';
+            employeeView.style.display = 'none';
+            employeeDetailView.style.display = 'none';
+            if (autoTimer) clearInterval(autoTimer);
+            startAutoTimer();
+        }
+
+        function switchToDetailView() {
+            mainView.style.display = 'none';
+            employeeView.style.display = 'none';
+            employeeDetailView.style.display = 'block';
+            window.scrollTo({ top: 0 });
+        }
+
+        function backToEmployeeList() {
+            employeeDetailView.style.display = 'none';
+            employeeView.style.display = 'block';
+            mainView.style.display = 'none';
+        }
+
+        function handleLogin() {
+            const user = usernameInput.value.trim();
+            const pwd = passwordInput.value;
+            if (user === VALID_USERNAME && pwd === VALID_PASSWORD) {
+                loginErrorMsg.textContent = '';
+                switchToEmployeeView();
+            } else {
+                loginErrorMsg.textContent = '密码错误，请重新输入';
+            }
+        }
+
+        showLoginBtn.addEventListener('click', openModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+        loginSubmitBtn.addEventListener('click', handleLogin);
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+
+        backToHomeBtn.addEventListener('click', switchToMainView);
+        backToEmployeeListBtn.addEventListener('click', backToEmployeeList);
+
+        // 轮播逻辑
+        function initDots() {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < images.length; i++) {
+                const dot = document.createElement('button');
+                dot.classList.add('dot');
+                dot.dataset.index = i;
+                dot.addEventListener('click', function() {
+                    goToSlide(parseInt(this.dataset.index));
+                    resetAutoTimer();
+                });
+                dotsContainer.appendChild(dot);
+            }
+            updateDotsActive();
+        }
+
+        function updateDotsActive() {
+            document.querySelectorAll('.dot').forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentIndex);
+            });
+        }
+
+        function goToSlide(index) {
+            if (index < 0) index = images.length - 1;
+            if (index >= images.length) index = 0;
+            currentIndex = index;
+            setImageWithFallback(carouselImg, images[currentIndex]);
+            updateDotsActive();
+        }
+
+        function nextSlide() { goToSlide(currentIndex + 1); }
+        function prevSlide() { goToSlide(currentIndex - 1); }
+
+        function startAutoTimer() {
+            if (autoTimer) clearInterval(autoTimer);
+            autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
+        }
+
+        function resetAutoTimer() {
+            clearInterval(autoTimer);
+            startAutoTimer();
+        }
+
+        prevBtn.addEventListener('click', () => { prevSlide(); resetAutoTimer(); });
+        nextBtn.addEventListener('click', () => { nextSlide(); resetAutoTimer(); });
+        const carouselContainer = document.getElementById('carouselContainer');
+        carouselContainer.addEventListener('mouseenter', () => clearInterval(autoTimer));
+        carouselContainer.addEventListener('mouseleave', startAutoTimer);
+
+        function initCarousel() {
+            currentIndex = 0;
+            setImageWithFallback(carouselImg, images[0]);
+            initDots();
+            startAutoTimer();
+        }
+        initCarousel();
+        window.addEventListener('beforeunload', () => { if (autoTimer) clearInterval(autoTimer); });
+
+        // ---------- 生成11行档案 ----------
+        const archiveCard = document.getElementById('archiveCard');
+        const recordContainer = document.getElementById('recordRowsContainer');
+        
+        function buildEmployeeRecords() {
+            if (!recordContainer) return;
+
+            const records = [
+                { left: '*佳丽', right: '领头人' },
+                { left: '温可欣', right: '大姐头' },
+                { left: '薛欣逸', right: '你去读心理学吧求你了' },
+                { left: '魏芷欣', right: '像是提前步入社会的社畜' },
+                { left: 'G**L**', right: '行踪不定的大姐姐' },
+                { left: '苏中立', right: '看起来超靠谱的大哥哥' },
+                { left: '杜天恩', right: '信号不在服务区' },
+                { left: '俞婕', right: '信号不在服务区' },
+                { left: '玉米侠', right: '我没记你名字就用网名了（对不起）' },
+                { left: '*恩惠', right: '左脑说要上班，右脑说有班上' },
+                { left: '尤梓涵', right: '超厉害的' }
+            ];
+
+            let html = '';
+            records.forEach((item, idx) => {
+                const isLast = (idx === records.length - 1);
+                const rowClass = isLast ? 'record-row clickable-row' : 'record-row';
+                html += `<div class="${rowClass}" data-row-index="${idx}">`;
+                html += `<span class="row-left">${item.left}</span>`;
+                html += `<span class="row-right">${item.right}</span>`;
+                html += `</div>`;
+            });
+            recordContainer.innerHTML = html;
+
+            const lastRow = recordContainer.querySelector('.clickable-row');
+            if (lastRow) {
+                lastRow.addEventListener('click', function(e) {
+                    // 防止点击选中文本时误触发跳转（如果用户是在拖拽选中的过程中松开鼠标，可能会同时触发click）
+                    // 简单处理：如果选区不为空，则优先处理替换而不跳转
+                    const selection = window.getSelection();
+                    if (selection.toString().length > 0) {
+                        return;
+                    }
+                    switchToDetailView();
+                });
+            }
+        }
+
+        buildEmployeeRecords();
+
+        // 初始化视图
+        employeeView.style.display = 'none';
+        employeeDetailView.style.display = 'none';
+        mainView.style.display = 'block';
+
+        // ---------- 通用选中替换函数 ----------
+        function applySelectionReplace(container, replaceMap) {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            
+            const selectedText = selection.toString();
+            if (replaceMap.hasOwnProperty(selectedText)) {
+                const range = selection.getRangeAt(0);
+                const parentElement = range.commonAncestorContainer;
+                
+                // 确保选区在指定容器内部
+                if (!container.contains(parentElement)) return;
+                
+                range.deleteContents();
+                const replacementNode = document.createTextNode(replaceMap[selectedText]);
+                range.insertNode(replacementNode);
+                
+                selection.removeAllRanges();
+                
+                const newRange = document.createRange();
+                newRange.setStartAfter(replacementNode);
+                newRange.collapse(true);
+                selection.addRange(newRange);
+            }
+        }
+
+        // ---------- 1. 员工档案页面的替换规则：温→①，哥→⑨，婕→⑩ ----------
+        const archiveReplaceMap = {
+            '温': '①',
+            '哥': '⑨',
+            '婕': '⑩'
+        };
+
+        function handleArchiveSelection() {
+            applySelectionReplace(archiveCard, archiveReplaceMap);
+        }
+
+        archiveCard.addEventListener('mouseup', handleArchiveSelection);
+        archiveCard.addEventListener('keyup', (e) => {
+            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Meta' || e.key.startsWith('Arrow')) {
+                handleArchiveSelection();
+            }
+        });
+
+        // ---------- 2. 员工详情页面的替换规则：和→③，o→⑧，博→⑤，a→④，有→⑦，小→②，这→⑥ ----------
+        const introPara = document.getElementById('detailIntroText');
+        const detailReplaceMap = {
+            '和': '③',
+            'o': '⑧',
+            '博': '⑤',
+            'a': '④',
+            '有': '⑦',
+            '小': '②',
+            '这': '⑥'
+        };
+
+        function handleDetailSelection() {
+            applySelectionReplace(introPara, detailReplaceMap);
+        }
+
+        introPara.addEventListener('mouseup', handleDetailSelection);
+        introPara.addEventListener('keyup', (e) => {
+            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Meta' || e.key.startsWith('Arrow')) {
+                handleDetailSelection();
+            }
+        });
+
+    })();
+</script>
+</body>
+</html>
